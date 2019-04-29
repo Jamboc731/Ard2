@@ -25,13 +25,17 @@ uint8_t devStatus;
 Quaternion q1;
 Quaternion q2;
 
-
+int Mpu1Pin = 8;
 
 void dmpDataReady() {
     interrupt = true;
 }
 
 void setup() {
+
+  pinMode(Mpu1Pin, OUTPUT);
+  digitalWrite(Mpu1Pin, HIGH);
+  
     // join I2C bus (I2Cdev library doesn't do this automatically)
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
         Wire.begin();
@@ -135,7 +139,8 @@ void setup() {
 }
 
 void loop() {
-  
+//  Serial.print("LOOP TOP - ");
+//  Serial.println(millis());
   interrupt = mpu1.getIntStatus();
   
   fifocount1 = mpu1.getFIFOCount();
@@ -150,7 +155,8 @@ void loop() {
   if(fifocount2 == 1024){
     mpu2.resetFIFO();
   }
-  
+//  Serial.print("LOOP MIDDLE - ");
+//  Serial.println(millis());
   if(interrupt){
     mpu1.getFIFOBytes(fifoBuffer1, packetSize1);
     mpu1.dmpGetQuaternion(&q1, fifoBuffer1);
@@ -172,9 +178,16 @@ void loop() {
       SendPositions();
     }
   }
-  
 
+//  Serial.print("LOOP END - ");
+//  Serial.println(millis());
+  
+  SendPositions();
   //Serial.println("Working");
+//  Serial.print("LOOP PROLOGUE - ");
+//  Serial.println(millis());
+
+  delay(5);
 }
 
 void SendPositions(){
