@@ -6,10 +6,12 @@ using System;
 
 public class ArduinoConnect : MonoBehaviour {
 
-    GameObject upper;
-    GameObject lower;
+    [SerializeField] GameObject upper;
+    [SerializeField] GameObject lower;
     Vector3 upRot;
     Vector3 lowRot;
+    Vector3 upLast;
+    Vector3 lowLast;
     public bool playing = true;
     public int commPort = 0;
 
@@ -30,10 +32,17 @@ public class ArduinoConnect : MonoBehaviour {
         WriteToArduino("p");
 
         readVal = ReadFromArduino();
-
-        string[] temp = readVal.Split('-');
-
-        Debug.Log(readVal);
+        //Debug.Log(readVal);
+        string[] tempa = readVal.Split('a');
+        Vector3 tempb = upLast;
+        if (!tempa[0].Contains("n"))
+        {
+            tempb = new Vector3(float.Parse(tempa[0].Split(',')[0]), float.Parse(tempa[0].Split(',')[1]), float.Parse(tempa[0].Split(',')[2]));
+            upLast = tempb;
+        }
+        //else Debug.Log(tempa[0]);
+        Debug.Log(tempb);
+        upper.transform.localEulerAngles = tempb;
 
     }
 
@@ -61,6 +70,25 @@ public class ArduinoConnect : MonoBehaviour {
         WriteToArduino("r");
         StopAllCoroutines();
         serial.Close();
+    }
+
+    public void ResetButton()
+    {
+        Debug.Log("reset");
+        serial.Close();
+        Debug.Log("closed");
+        serial.Open();
+        Debug.Log("open");
+    }
+
+    void PositionObjects()
+    {
+
+    }
+
+    void PositionObject(Vector3 rot)
+    {
+
     }
 
 }

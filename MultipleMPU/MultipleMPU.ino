@@ -103,12 +103,6 @@ void setup() {
     Serial.println(F("Testing device connections..."));
     Serial.println(mpu2.testConnection() ? F("MPU6050 2 connection successful") : F("MPU6050 2 connection failed"));
 
-    // wait for ready
-    Serial.println(F("\nSend any character to begin DMP programming and demo: "));
-    while (Serial.available() && Serial.read()); // empty buffer
-    while (!Serial.available());                 // wait for data
-    while (Serial.available() && Serial.read()); // empty buffer again
-
     // load and configure the DMP
     Serial.println(F("Initializing DMP..."));
     devStatus = mpu2.dmpInitialize();
@@ -136,6 +130,13 @@ void setup() {
         Serial.print(devStatus);
         Serial.println(F(")"));
     }
+
+    // wait for ready
+    Serial.println(F("\nSend any character to begin DMP programming and demo: "));
+    while (Serial.available() && Serial.read()); // empty buffer
+    while (!Serial.available());                 // wait for data
+    while (Serial.available() && Serial.read()); // empty buffer again
+    
 }
 
 void loop() {
@@ -197,7 +198,7 @@ void SendPositions(){
   Serial.print(euler1[1] * 180/M_PI);
   Serial.print(",");
   Serial.print(euler1[2] * 180/M_PI);
-  Serial.print("-");
+  Serial.print("a");
   Serial.print(euler2[0] * 180/M_PI);
   Serial.print(",");
   Serial.print(euler2[1] * 180/M_PI);
