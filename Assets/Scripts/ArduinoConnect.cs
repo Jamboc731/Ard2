@@ -25,7 +25,7 @@ public class ArduinoConnect : MonoBehaviour {
     private void Start()
     {
         //start the serial connection with the arduino 
-        serial = new SerialPort("\\\\.\\COM" + commPort, 9600);
+        serial = new SerialPort("\\\\.\\COM" + commPort, 115200);
         serial.ReadTimeout = 50;
         serial.Open();
         //write to the arduino to start it

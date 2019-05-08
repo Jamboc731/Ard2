@@ -25,7 +25,6 @@ uint8_t devStatus;
 Quaternion q1;
 Quaternion q2;
 
-int Mpu1Pin = 8;
 
 void dmpDataReady() {
     interrupt = true;
@@ -35,8 +34,6 @@ void setup() {
 
 
 //this is the setup function from the MPU6050_DMP6 example by Jeff Rowberg <jeff@rowberg.net>
-  pinMode(Mpu1Pin, OUTPUT);
-  digitalWrite(Mpu1Pin, HIGH);
   
     // join I2C bus (I2Cdev library doesn't do this automatically)
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
@@ -49,7 +46,7 @@ void setup() {
     // initialize serial communication
     // (115200 chosen because it is required for Teapot Demo output, but it's
     // really up to you depending on your project)
-    Serial.begin(9600);
+    Serial.begin(115200);
     while (!Serial); // wait for Leonardo enumeration, others continue immediately
 
     Serial.println(F("Initializing I2C device 1"));
@@ -197,7 +194,7 @@ void loop() {
       SendPositions();
     }
   }
-  SendPositions();
+//  SendPositions();
   delay(50);
 }
 
