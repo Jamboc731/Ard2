@@ -33,6 +33,8 @@ void dmpDataReady() {
 
 void setup() {
 
+
+//this is the setup function from the MPU6050_DMP6 example by Jeff Rowberg <jeff@rowberg.net>
   pinMode(Mpu1Pin, OUTPUT);
   digitalWrite(Mpu1Pin, HIGH);
   
@@ -60,13 +62,19 @@ void setup() {
     // load and configure the DMP
     Serial.println(F("Initializing DMP..."));
     devStatus = mpu1.dmpInitialize();
-
+/*
     // supply your own gyro offsets here, scaled for min sensitivity
     mpu1.setXGyroOffset(220);
     mpu1.setYGyroOffset(76);
     mpu1.setZGyroOffset(-85);
     mpu1.setZAccelOffset(1788); // 1688 factory default for my test chip
+*/
 
+    mpu2.setXGyroOffset(0);
+    mpu2.setYGyroOffset(0);
+    mpu2.setZGyroOffset(0);
+    mpu2.setZAccelOffset(0);
+    
     // make sure it worked (returns 0 if so)
     if (devStatus == 0) {
         // turn on the DMP, now that it's ready
@@ -106,12 +114,18 @@ void setup() {
     // load and configure the DMP
     Serial.println(F("Initializing DMP..."));
     devStatus = mpu2.dmpInitialize();
-
+/*
     // supply your own gyro offsets here, scaled for min sensitivity
     mpu2.setXGyroOffset(220);
     mpu2.setYGyroOffset(76);
     mpu2.setZGyroOffset(-85);
     mpu2.setZAccelOffset(1788); // 1688 factory default for my test chip
+    */
+    mpu2.setXGyroOffset(0);
+    mpu2.setYGyroOffset(0);
+    mpu2.setZGyroOffset(0);
+    mpu2.setZAccelOffset(0);
+
 
     // make sure it worked (returns 0 if so)
     if (devStatus == 0) {
@@ -140,24 +154,26 @@ void setup() {
 }
 
 void loop() {
-//  Serial.print("LOOP TOP - ");
-//  Serial.println(millis());
+
+  //gets interrupt status of first MPU
   interrupt = mpu1.getIntStatus();
-  
+
+  //gets both MPU fifo counts
   fifocount1 = mpu1.getFIFOCount();
   fifocount2 = mpu2.getFIFOCount();
 
+  //gets fifobytes from each MPU
   mpu1.getFIFOBytes(fifoBuffer1, packetSize1);
   mpu2.getFIFOBytes(fifoBuffer2, packetSize2);
 
+  //if the fifo count is more than the imit then empty the buffer
   if(fifocount1 == 1024){
     mpu1.resetFIFO();
   }
   if(fifocount2 == 1024){
     mpu2.resetFIFO();
   }
-//  Serial.print("LOOP MIDDLE - ");
-//  Serial.println(millis());
+  //if the MPU has data to send then get the data
   if(interrupt){
     mpu1.getFIFOBytes(fifoBuffer1, packetSize1);
     mpu1.dmpGetQuaternion(&q1, fifoBuffer1);
@@ -172,37 +188,38 @@ void loop() {
     interrupt = false;
     }  
   else{
+    //show that the MPU has no data to send
     Serial.println("noInterrupt");
   }
+  //if unity is asking for the positions then send them
   if(Serial.available()){
     if(Serial.read() == 'p'){
       SendPositions();
     }
   }
-
-//  Serial.print("LOOP END - ");
-//  Serial.println(millis());
-  
   SendPositions();
-  //Serial.println("Working");
-//  Serial.print("LOOP PROLOGUE - ");
-//  Serial.println(millis());
-
-  delay(5);
+  delay(50);
 }
 
 void SendPositions(){
 
-  Serial.print(euler1[0] * 180/M_PI);
+//send the positions in quaternion form to the serial
+  mpu1.dmpGetQuaternion(&q1, fifoBuffer1);
+  mpu2.dmpGetQuaternion(&q2, fifoBuffer2);
+  Serial.print(q1.w);
   Serial.print(",");
-  Serial.print(euler1[1] * 180/M_PI);
+  Serial.print(q1.x);
   Serial.print(",");
-  Serial.print(euler1[2] * 180/M_PI);
+  Serial.print(q1.y);
+  Serial.print(",");
+  Serial.print(q1.z);
   Serial.print("a");
-  Serial.print(euler2[0] * 180/M_PI);
+  Serial.print(q2.w);
   Serial.print(",");
-  Serial.print(euler2[1] * 180/M_PI);
+  Serial.print(q2.x);
   Serial.print(",");
-  Serial.println(euler1[2] * 180/M_PI);
+  Serial.print(q2.y);
+  Serial.print(",");
+  Serial.println(q2.z);
   
 }
